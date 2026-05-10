@@ -14,12 +14,14 @@
     "format": "prettier --write . && eslint --fix",
     "check": "prettier --check .",
     "check-types": "tsc --noEmit",
-    "deploy": "pnpm run build && wrangler deploy"
+    "deploy": "pnpm run build && wrangler deploy",
+    "orval": "orval"
   },
   "dependencies": {
     "@cloudflare/vite-plugin": "catalog:",
     "@tailwindcss/vite": "catalog:",
     "@tanstack/react-devtools": "catalog:",
+    "@tanstack/react-query": "catalog:",
     "@tanstack/react-router": "catalog:",
     "@tanstack/react-router-devtools": "catalog:",
     "@tanstack/react-router-ssr-query": "catalog:",
@@ -28,7 +30,8 @@
     "lucide-react": "catalog:",
     "react": "catalog:",
     "react-dom": "catalog:",
-    "tailwindcss": "catalog:"
+    "tailwindcss": "catalog:",
+    "zod": "catalog:"
   },
   "devDependencies": {
     "@tailwindcss/typography": "catalog:",
@@ -42,6 +45,7 @@
     "@vitejs/plugin-react": "catalog:",
     "eslint": "catalog:",
     "jsdom": "catalog:",
+    "orval": "catalog:",
     "prettier": "catalog:",
     "typescript": "catalog:",
     "vite": "catalog:",
