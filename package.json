@@ -3,18 +3,17 @@
   "private": true,
   "scripts": {
     "build": "turbo run build",
-    "dev": "turbo run dev",
+    "dev": "mkdir -p tmp && turbo run dev 2>&1 | tee tmp/dev.log",
     "lint": "turbo run lint",
-    "format": "prettier --write \"**/*.{ts,tsx,md}\"",
-    "check-types": "turbo run check-types"
+    "format": "turbo run format",
+    "check-types": "turbo run check-types",
+    "test": "turbo run test"
   },
   "devDependencies": {
-    "prettier": "^3.7.4",
-    "turbo": "^2.9.10",
-    "typescript": "5.9.2"
+    "turbo": "catalog:"
   },
-  "packageManager": "pnpm@9.0.0",
+  "packageManager": "pnpm@11.0.8",
   "engines": {
-    "node": ">=18"
+    "node": ">=22"
   }
 }
