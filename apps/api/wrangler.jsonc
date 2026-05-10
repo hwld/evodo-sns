@@ -4,8 +4,8 @@
   "main": "src/index.ts",
   "compatibility_date": "2026-05-09",
   "dev": {
-    "inspector_port": 9229
-  }
+    "inspector_port": 9229,
+  },
   // "compatibility_flags": [
   //   "nodejs_compat"
   // ],
