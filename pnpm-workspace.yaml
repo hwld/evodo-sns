@@ -5,6 +5,7 @@ packages:
 allowBuilds:
   better-sqlite3: true
   esbuild: true
+  lefthook: true
   lightningcss: true
   sharp: true
   unrs-resolver: true
@@ -37,6 +38,7 @@ catalog:
   eslint: ^10.3.0
   hono: ^4.12.18
   jsdom: ^28.1.0
+  lefthook: ^2.1.6
   lucide-react: ^0.545.0
   orval: ^8.9.1
   prettier: ^3.8.1

@@ -1,19 +1,15 @@
-//  @ts-check
-
-import { tanstackConfig } from '@tanstack/eslint-config'
+// @ts-check
+import { tanstackStartConfig } from "@evodo/eslint-config/tanstack-start";
 
 export default [
-  ...tanstackConfig,
+  ...tanstackStartConfig,
   {
-    rules: {
-      'import/no-cycle': 'off',
-      'import/order': 'off',
-      'sort-imports': 'off',
-      '@typescript-eslint/array-type': 'off',
-      '@typescript-eslint/require-await': 'off',
-    },
+    ignores: [
+      "eslint.config.js",
+      "prettier.config.js",
+      "dist/**",
+      "coverage/**",
+      ".wrangler/**",
+    ],
   },
-  {
-    ignores: ['eslint.config.js', 'prettier.config.js'],
-  },
-]
+];

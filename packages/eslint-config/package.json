@@ -1,0 +1,18 @@
+{
+  "name": "@evodo/eslint-config",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "exports": {
+    "./base": "./base.js",
+    "./tanstack-start": "./tanstack-start.js"
+  },
+  "dependencies": {
+    "@eslint/js": "^10.0.1",
+    "@tanstack/eslint-config": "catalog:",
+    "typescript-eslint": "^8.55.0"
+  },
+  "peerDependencies": {
+    "eslint": "^9.0.0 || ^10.0.0"
+  }
+}

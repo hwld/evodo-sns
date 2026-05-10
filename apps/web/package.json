@@ -11,9 +11,11 @@
     "preview": "vite preview",
     "test": "vitest run",
     "lint": "eslint",
+    "lint:fix": "eslint --fix",
     "format": "prettier --write . && eslint --fix",
-    "check": "prettier --check .",
-    "check-types": "tsc --noEmit",
+    "format:check": "prettier --check .",
+    "typecheck": "tsc --noEmit",
+    "check": "pnpm format:check && pnpm lint && pnpm typecheck",
     "deploy": "pnpm run build && wrangler deploy",
     "orval": "orval"
   },
@@ -35,8 +37,8 @@
   },
   "devDependencies": {
     "@tailwindcss/typography": "catalog:",
+    "@evodo/eslint-config": "workspace:*",
     "@tanstack/devtools-vite": "catalog:",
-    "@tanstack/eslint-config": "catalog:",
     "@testing-library/dom": "catalog:",
     "@testing-library/react": "catalog:",
     "@types/node": "catalog:",

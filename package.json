@@ -6,10 +6,15 @@
     "dev": "mkdir -p tmp && turbo run dev 2>&1 | tee tmp/dev.log",
     "lint": "turbo run lint",
     "format": "turbo run format",
-    "check-types": "turbo run check-types",
-    "test": "turbo run test"
+    "check": "turbo run check",
+    "typecheck": "turbo run typecheck",
+    "test": "turbo run test",
+    "prepare": "lefthook install"
   },
   "devDependencies": {
+    "eslint": "catalog:",
+    "lefthook": "catalog:",
+    "prettier": "catalog:",
     "turbo": "catalog:"
   },
   "packageManager": "pnpm@11.0.8",

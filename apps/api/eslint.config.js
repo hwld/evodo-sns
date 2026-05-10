@@ -1,8 +1,8 @@
 // @ts-check
-import { tanstackStartConfig } from "@evodo/eslint-config/tanstack-start";
+import { base } from "@evodo/eslint-config/base";
 
 export default [
-  ...tanstackStartConfig,
+  ...base,
   {
     ignores: [
       "eslint.config.js",
@@ -10,6 +10,9 @@ export default [
       "dist/**",
       "coverage/**",
       ".wrangler/**",
+      "drizzle/**",
+      "migrations/**",
+      "worker-configuration.d.ts",
     ],
   },
 ];
