@@ -1,0 +1,13 @@
+# Better Auth の cookie / session 署名鍵。
+# 本番では `wrangler secret put BETTER_AUTH_SECRET` で投入。
+# 生成例: `openssl rand -base64 32`
+BETTER_AUTH_SECRET=
+
+# Resend の API key（production の OTP 送信用）。
+# 開発環境では未使用（sendVerificationOTP は console.log にフォールバック）。
+RESEND_API_KEY=
+
+# admin として扱う user.id のカンマ区切りリスト。
+# 自分が apps/web で通常ユーザー登録 → user.id を取得 → ここに入れる。
+# 本番では `wrangler secret put ADMIN_USER_IDS` で投入。
+ADMIN_USER_IDS=

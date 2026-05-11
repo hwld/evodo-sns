@@ -3,6 +3,7 @@ packages:
   - "packages/*"
 
 allowBuilds:
+  "@prisma/client": false
   better-sqlite3: true
   esbuild: true
   lefthook: true
@@ -12,6 +13,9 @@ allowBuilds:
   workerd: true
 
 catalog:
+  "@better-auth/cli": ^1.4.21
+  "@better-auth/drizzle-adapter": ^1.6.10
+  "@better-auth/passkey": ^1.6.10
   "@cloudflare/vite-plugin": ^1.26.0
   "@cloudflare/vitest-pool-workers": ^0.16.3
   "@hono/zod-openapi": ^1.4.0
@@ -32,6 +36,7 @@ catalog:
   "@types/react": ^19.2.0
   "@types/react-dom": ^19.2.0
   "@vitejs/plugin-react": ^6.0.1
+  better-auth: ^1.6.10
   better-sqlite3: ^12.9.0
   drizzle-kit: ^0.31.10
   drizzle-orm: ^0.45.2
