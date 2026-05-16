@@ -97,7 +97,7 @@ describe("/admin/v1/* routes", () => {
   });
 });
 
-describe("auth e2e", () => {
+describe("auth integration", () => {
   beforeEach(async () => {
     await cleanAuthTables(env.DB);
   });
