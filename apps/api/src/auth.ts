@@ -4,6 +4,8 @@ import { betterAuth } from "better-auth";
 import { admin, emailOTP, username } from "better-auth/plugins";
 import { drizzle } from "drizzle-orm/d1";
 
+import * as schema from "./db/schema";
+
 type Env = {
   DB: D1Database;
   ENVIRONMENT: "development" | "production";
@@ -27,7 +29,7 @@ export const createAuth = (env: Env) => {
   return betterAuth({
     baseURL,
     secret: env.BETTER_AUTH_SECRET,
-    database: drizzleAdapter(db, { provider: "sqlite" }),
+    database: drizzleAdapter(db, { provider: "sqlite", schema }),
     advanced: {
       crossSubDomainCookies: { enabled: true },
     },
