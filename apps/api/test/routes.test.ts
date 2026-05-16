@@ -50,3 +50,25 @@ describe("session middleware", () => {
     expect(body.session).toBeNull();
   });
 });
+
+describe("/v1/* routes", () => {
+  it("GET /v1/me returns 401 when not authenticated", async () => {
+    const { default: app } = await import("../src/index");
+    const res = await app.request("/v1/me", {}, {
+      DB: env.DB,
+      ENVIRONMENT: "development",
+    } as Cloudflare.Env);
+    expect(res.status).toBe(401);
+  });
+
+  it("GET /v1/openapi.json returns the OpenAPI document", async () => {
+    const { default: app } = await import("../src/index");
+    const res = await app.request("/v1/openapi.json", {}, {
+      DB: env.DB,
+      ENVIRONMENT: "development",
+    } as Cloudflare.Env);
+    expect(res.status).toBe(200);
+    const doc = (await res.json()) as { info: { title: string } };
+    expect(doc.info.title).toBe("evodo-sns v1 API");
+  });
+});
