@@ -41,7 +41,7 @@
 - **1 投稿 = 1 TODO リスト** という形式
 - 投稿はタイトル + 本文 + 複数のタスクで構成され、各タスクは open / done のチェック状態を持つ
 - 投稿に対して誰でもコメントを書ける
-- 投稿全体および個別タスクに対して「応援（Cheer）」を送れる
+- 投稿に対して「応援（Cheer）」を送れる
 
 ---
 
@@ -185,13 +185,11 @@ erDiagram
     User ||--o{ Post : authors
     User ||--o{ Comment : writes
     User ||--o{ PostCheer : gives
-    User ||--o{ TaskCheer : gives
     User ||--o{ Follow : follower
     User ||--o{ Follow : followee
     Post ||--o{ Task : contains
     Post ||--o{ Comment : has
     Post ||--o{ PostCheer : receives
-    Task ||--o{ TaskCheer : receives
 
     User {
         string id PK
@@ -233,11 +231,6 @@ erDiagram
         string userId PK_FK
         datetime createdAt
     }
-    TaskCheer {
-        string taskId PK_FK
-        string userId PK_FK
-        datetime createdAt
-    }
     Follow {
         string followerId PK_FK
         string followeeId PK_FK
@@ -272,10 +265,11 @@ erDiagram
 - Post に対して誰でも書ける（自分の Post への自分のコメントも可）
 - スレッド / リプライは v1 では持たない
 
-**PostCheer / TaskCheer**
+**PostCheer**
 
-- `(targetId, userId)` の複合 PK で重複防止
-- 1 ユーザーが 1 対象に 1 Cheer
+- `(postId, userId)` の複合 PK で重複防止
+- 1 ユーザーが 1 Post に 1 Cheer
+- タスク単位の Cheer は持たない（v1 では Post 単位のみ）
 - Like 相当のシンプルな実装で開始。リッチ化（メッセージ付き応援等）は拡張候補
 
 **Follow**
