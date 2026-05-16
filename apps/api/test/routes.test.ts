@@ -183,6 +183,7 @@ describe("auth e2e", () => {
       },
       testEnv,
     );
+    expect(signInRes.status).toBe(200);
     const cookie = signInRes.headers.get("set-cookie") ?? "";
 
     // /admin/v1/users は role=user なので 403
