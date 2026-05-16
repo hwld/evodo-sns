@@ -14,3 +14,16 @@ describe("test infrastructure", () => {
     expect(tables).toContain("passkey");
   });
 });
+
+describe("auth handler mount", () => {
+  it("GET /api/auth/get-session responds 200 with null when no cookie", async () => {
+    const { default: app } = await import("../src/index");
+    const res = await app.request("/api/auth/get-session", {}, {
+      DB: env.DB,
+      ENVIRONMENT: "development",
+    } as Cloudflare.Env);
+    expect(res.status).toBe(200);
+    const body = await res.json();
+    expect(body).toBeNull();
+  });
+});
