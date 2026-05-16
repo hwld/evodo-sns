@@ -2,6 +2,7 @@ import { Hono } from "hono";
 
 import { createAuth } from "./auth";
 import type { AppEnv } from "./env";
+import admin from "./routes/admin";
 import v1 from "./routes/v1";
 
 const app = new Hono<AppEnv>();
@@ -14,5 +15,6 @@ app.on(["POST", "GET"], "/api/auth/*", (c) => {
 });
 
 app.route("/v1", v1);
+app.route("/admin/v1", admin);
 
 export default app;

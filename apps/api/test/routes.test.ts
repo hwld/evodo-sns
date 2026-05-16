@@ -72,3 +72,25 @@ describe("/v1/* routes", () => {
     expect(doc.info.title).toBe("evodo-sns v1 API");
   });
 });
+
+describe("/admin/v1/* routes", () => {
+  it("GET /admin/v1/users returns 401 when not authenticated", async () => {
+    const { default: app } = await import("../src/index");
+    const res = await app.request("/admin/v1/users", {}, {
+      DB: env.DB,
+      ENVIRONMENT: "development",
+    } as Cloudflare.Env);
+    expect(res.status).toBe(401);
+  });
+
+  it("GET /admin/v1/openapi.json returns the admin OpenAPI document", async () => {
+    const { default: app } = await import("../src/index");
+    const res = await app.request("/admin/v1/openapi.json", {}, {
+      DB: env.DB,
+      ENVIRONMENT: "development",
+    } as Cloudflare.Env);
+    expect(res.status).toBe(200);
+    const doc = (await res.json()) as { info: { title: string } };
+    expect(doc.info.title).toBe("evodo-sns admin API");
+  });
+});
