@@ -1,7 +1,9 @@
 import { env } from "cloudflare:test";
-import { describe, expect, it } from "vitest";
+import { beforeEach, describe, expect, it } from "vitest";
 
 import type { AppEnv } from "../src/env";
+
+import { cleanAuthTables, getOtpForEmail } from "./helpers";
 
 describe("test infrastructure", () => {
   it("D1 has Better Auth tables after migrations", async () => {
@@ -92,5 +94,64 @@ describe("/admin/v1/* routes", () => {
     expect(res.status).toBe(200);
     const doc = (await res.json()) as { info: { title: string } };
     expect(doc.info.title).toBe("evodo-sns admin API");
+  });
+});
+
+describe("auth e2e", () => {
+  beforeEach(async () => {
+    await cleanAuthTables(env.DB);
+  });
+
+  it("OTP サインアップ → /v1/me で本人情報が取れる", async () => {
+    const { default: app } = await import("../src/index");
+    const testEnv = {
+      DB: env.DB,
+      ENVIRONMENT: "development",
+    } as Cloudflare.Env;
+    const email = "alice@example.com";
+
+    // 1. OTP 送信
+    const sendRes = await app.request(
+      "/api/auth/email-otp/send-verification-otp",
+      {
+        method: "POST",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify({ email, type: "sign-in" }),
+      },
+      testEnv,
+    );
+    expect(sendRes.status).toBe(200);
+
+    // 2. D1 から OTP を取得
+    const otp = await getOtpForEmail(env.DB, email);
+    expect(otp).toMatch(/^\d{6}$/);
+
+    // 3. OTP でサインイン
+    const signInRes = await app.request(
+      "/api/auth/sign-in/email-otp",
+      {
+        method: "POST",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify({ email, otp }),
+      },
+      testEnv,
+    );
+    expect(signInRes.status).toBe(200);
+    const cookie = signInRes.headers.get("set-cookie");
+    expect(cookie).toContain("better-auth.session_token");
+
+    // 4. cookie 付きで /v1/me が取れる
+    const meRes = await app.request(
+      "/v1/me",
+      { headers: { cookie: cookie ?? "" } },
+      testEnv,
+    );
+    expect(meRes.status).toBe(200);
+    const me = (await meRes.json()) as {
+      email: string;
+      role: string;
+    };
+    expect(me.email).toBe(email);
+    expect(me.role).toBe("user");
   });
 });
