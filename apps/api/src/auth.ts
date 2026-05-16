@@ -4,12 +4,13 @@ import { betterAuth } from "better-auth";
 import { admin, emailOTP, username } from "better-auth/plugins";
 import { drizzle } from "drizzle-orm/d1";
 
+import * as schema from "./db/schema";
+
 type Env = {
   DB: D1Database;
   ENVIRONMENT: "development" | "production";
   BETTER_AUTH_SECRET?: string;
   BETTER_AUTH_URL?: string;
-  ADMIN_USER_IDS?: string;
 };
 
 export const createAuth = (env: Env) => {
@@ -19,15 +20,11 @@ export const createAuth = (env: Env) => {
     (env.ENVIRONMENT === "development"
       ? "http://localhost:8787"
       : "https://api.evodo.hwld.dev");
-  const adminUserIds =
-    env.ADMIN_USER_IDS?.split(",")
-      .map((s) => s.trim())
-      .filter(Boolean) ?? [];
 
   return betterAuth({
     baseURL,
     secret: env.BETTER_AUTH_SECRET,
-    database: drizzleAdapter(db, { provider: "sqlite" }),
+    database: drizzleAdapter(db, { provider: "sqlite", schema }),
     advanced: {
       crossSubDomainCookies: { enabled: true },
     },
@@ -52,7 +49,7 @@ export const createAuth = (env: Env) => {
         },
       }),
       username({ minUsernameLength: 3, maxUsernameLength: 30 }),
-      admin({ adminUserIds }),
+      admin(),
     ],
   });
 };

@@ -3,6 +3,7 @@
   "name": "api",
   "main": "src/index.ts",
   "compatibility_date": "2026-05-09",
+  "compatibility_flags": ["nodejs_compat"],
   "dev": {
     "inspector_port": 9229,
   },
