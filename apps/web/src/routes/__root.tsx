@@ -2,6 +2,8 @@ import { HeadContent, Scripts, createRootRoute } from "@tanstack/react-router";
 import { TanStackRouterDevtoolsPanel } from "@tanstack/react-router-devtools";
 import { TanStackDevtools } from "@tanstack/react-devtools";
 
+import { AppHeader } from "@/components/app-header";
+import { ThemeProvider } from "@/components/theme-provider";
 import appCss from "../styles.css?url";
 
 export const Route = createRootRoute({
@@ -15,7 +17,7 @@ export const Route = createRootRoute({
         content: "width=device-width, initial-scale=1",
       },
       {
-        title: "TanStack Start Starter",
+        title: "evodo",
       },
     ],
     links: [
@@ -30,12 +32,15 @@ export const Route = createRootRoute({
 
 function RootDocument({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en">
+    <html lang="ja" suppressHydrationWarning>
       <head>
         <HeadContent />
       </head>
       <body>
-        {children}
+        <ThemeProvider defaultTheme="system" storageKey="theme">
+          <AppHeader />
+          <main className="container mx-auto p-4">{children}</main>
+        </ThemeProvider>
         <TanStackDevtools
           config={{
             position: "bottom-right",

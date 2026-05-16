@@ -1,13 +1,15 @@
 import { createFileRoute } from "@tanstack/react-router";
 
-export const Route = createFileRoute("/")({ component: Home });
+export const Route = createFileRoute("/")({
+  component: Home,
+});
 
 function Home() {
   return (
-    <div className="p-8">
-      <h1 className="text-4xl font-bold">Welcome to TanStack Start</h1>
-      <p className="mt-4 text-lg">
-        Edit <code>src/routes/index.tsx</code> to get started.
+    <div className="space-y-4">
+      <h1 className="text-2xl font-semibold">evodo</h1>
+      <p className="text-muted-foreground">
+        1 投稿 = 1 TODO リスト の SNS（実装中）
       </p>
     </div>
   );

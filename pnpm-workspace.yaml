@@ -8,6 +8,7 @@ allowBuilds:
   esbuild: true
   lefthook: true
   lightningcss: true
+  msw: false
   sharp: true
   unrs-resolver: true
   workerd: true
