@@ -82,10 +82,12 @@ Mastodon / Discourse / Forem / Lemmy などの SNS 系 OSS は全て「ログイ
 ### 採用する設定値（要点）
 
 ```ts
+import * as schema from "./db/schema";
+
 betterAuth({
   baseURL: <env で導出>,
   secret: env.BETTER_AUTH_SECRET,
-  database: drizzleAdapter(db, { provider: "sqlite" }),
+  database: drizzleAdapter(db, { provider: "sqlite", schema }),
   advanced: {
     crossSubDomainCookies: { enabled: true },
   },
@@ -99,12 +101,17 @@ betterAuth({
     passkey({ rpID: "evodo.hwld.dev", rpName: "evodo" }),
     emailOTP({ async sendVerificationOTP({ email, otp, type }) { ... } }),
     username({ minUsernameLength: 3, maxUsernameLength: 30 }),
-    admin({ adminUserIds: env.ADMIN_USER_IDS?.split(",") ?? [] }),
+    admin(),
   ],
 })
 ```
 
 `role` カラムは `admin()` プラグインが追加するため、`additionalFields` には書かない。
+**`drizzleAdapter` には必ず `schema` を渡す**こと（省略すると verification 等のテーブルを Better Auth が引けず 500）。
+
+### Workers 互換性フラグ
+
+Better Auth は内部で `AsyncLocalStorage`（`node:async_hooks`）を使うため、`apps/api/wrangler.jsonc` に **`compatibility_flags: ["nodejs_compat"]`** を必ず設定する。未設定だと session を触る全エンドポイントが 500 になる。
 
 ---
 
@@ -132,7 +139,7 @@ betterAuth({
 - `user`（デフォルト）: 一般利用者。投稿、コメント、Cheer、フォロー
 - `admin`: 全ユーザー閲覧、BAN、impersonate、ユーザー削除等の管理操作
 - `additionalFields` ではなく `admin()` プラグインが提供する `role` カラムを使う
-- `adminUserIds` 環境変数による上書き機構が `admin()` プラグインに組み込まれている（DB の role を見ずに常に admin 扱いする user.id リスト）
+- 初期 admin は SQL 直接更新で作る（後述）
 
 ### `banned` の意味論（admin プラグイン由来）
 
@@ -245,6 +252,28 @@ apps/api の /admin/v1/* に middleware
 ```
 
 サーバ側ガードがホンモノ。フロント側ガードはバイパス可能なので過信しない。
+
+### 初期 admin の作り方
+
+DB の `user.role` を直接更新する:
+
+1. 通常 user として apps/web からサインアップ（OTP → Passkey 登録）
+2. 自分の `user.id` を取得（例: `/v1/me` を叩いて id を確認、または D1 を `SELECT` する）
+3. SQL で role を `admin` に更新:
+
+```bash
+# local
+pnpm exec wrangler d1 execute evodo-db --local \
+  --command "UPDATE user SET role='admin' WHERE id='<your_user_id>'"
+
+# production
+pnpm exec wrangler d1 execute evodo-db --remote \
+  --command "UPDATE user SET role='admin' WHERE id='<your_user_id>'"
+```
+
+4. 次のリクエストから admin 扱いになる（session middleware が DB から user を引き直すため）
+
+将来 admin を増やすなら、既存 admin が apps/admin の UI から `setRole` API（Better Auth admin プラグイン）で昇格させる。
 
 ---
 
@@ -412,11 +441,10 @@ Django / Laravel / Rails / Auth.js / Supabase いずれも「dev では console 
 
 ### 設定
 
-| 名前              | 種類                   | 用途                            | 値                               |
-| ----------------- | ---------------------- | ------------------------------- | -------------------------------- |
-| `ENVIRONMENT`     | var                    | 環境分岐                        | `"development"` / `"production"` |
-| `BETTER_AUTH_URL` | var（任意）            | baseURL の上書き                | 通常は ENVIRONMENT から自動導出  |
-| `ADMIN_USER_IDS`  | secret（カンマ区切り） | admin として扱う user.id リスト | 例: `<user_id_1>,<user_id_2>`    |
+| 名前              | 種類        | 用途             | 値                               |
+| ----------------- | ----------- | ---------------- | -------------------------------- |
+| `ENVIRONMENT`     | var         | 環境分岐         | `"development"` / `"production"` |
+| `BETTER_AUTH_URL` | var（任意） | baseURL の上書き | 通常は ENVIRONMENT から自動導出  |
 
 ### 設定方法
 
@@ -424,11 +452,9 @@ Django / Laravel / Rails / Auth.js / Supabase いずれも「dev では console 
 # secret
 wrangler secret put BETTER_AUTH_SECRET
 wrangler secret put RESEND_API_KEY
-wrangler secret put ADMIN_USER_IDS
 
 # 開発時
 echo 'BETTER_AUTH_SECRET=...' >> apps/api/.dev.vars
-echo 'ADMIN_USER_IDS=...' >> apps/api/.dev.vars
 ```
 
 `.dev.vars.example` をリポジトリに含めて、必要な変数を明示する。
