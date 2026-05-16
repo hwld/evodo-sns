@@ -5,6 +5,9 @@ import type { AppEnv } from "../env";
 
 const v1 = new OpenAPIHono<AppEnv>();
 
+// /openapi.json は public にしたいので、auth middleware より前に登録する。
+// Hono の use("*", ...) は登録順より後のルートにのみ適用されるため、
+// この順序を保つこと（middleware を上に動かすと openapi.json が 401 化する）。
 v1.doc("/openapi.json", {
   openapi: "3.1.0",
   info: { title: "evodo-sns v1 API", version: "0.1.0" },
