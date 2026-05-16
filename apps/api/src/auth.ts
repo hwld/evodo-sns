@@ -11,7 +11,6 @@ type Env = {
   ENVIRONMENT: "development" | "production";
   BETTER_AUTH_SECRET?: string;
   BETTER_AUTH_URL?: string;
-  ADMIN_USER_IDS?: string;
 };
 
 export const createAuth = (env: Env) => {
@@ -21,10 +20,6 @@ export const createAuth = (env: Env) => {
     (env.ENVIRONMENT === "development"
       ? "http://localhost:8787"
       : "https://api.evodo.hwld.dev");
-  const adminUserIds =
-    env.ADMIN_USER_IDS?.split(",")
-      .map((s) => s.trim())
-      .filter(Boolean) ?? [];
 
   return betterAuth({
     baseURL,
@@ -54,7 +49,7 @@ export const createAuth = (env: Env) => {
         },
       }),
       username({ minUsernameLength: 3, maxUsernameLength: 30 }),
-      admin({ adminUserIds }),
+      admin(),
     ],
   });
 };

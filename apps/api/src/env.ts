@@ -5,7 +5,6 @@ export type Bindings = {
   ENVIRONMENT: "development" | "production";
   BETTER_AUTH_SECRET?: string;
   BETTER_AUTH_URL?: string;
-  ADMIN_USER_IDS?: string;
 };
 
 export type SessionUser = Auth["$Infer"]["Session"]["user"];
