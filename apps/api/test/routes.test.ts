@@ -194,4 +194,58 @@ describe("auth e2e", () => {
     );
     expect(adminRes.status).toBe(403);
   });
+
+  it("role='admin' に昇格した user は /admin/v1/users で 200", async () => {
+    const { default: app } = await import("../src/index");
+    const testEnv = {
+      DB: env.DB,
+      ENVIRONMENT: "development",
+    } as Cloudflare.Env;
+    const email = "carol@example.com";
+
+    // サインアップ → サインイン
+    await app.request(
+      "/api/auth/email-otp/send-verification-otp",
+      {
+        method: "POST",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify({ email, type: "sign-in" }),
+      },
+      testEnv,
+    );
+    const otp = await getOtpForEmail(env.DB, email);
+    const signInRes = await app.request(
+      "/api/auth/sign-in/email-otp",
+      {
+        method: "POST",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify({ email, otp }),
+      },
+      testEnv,
+    );
+    expect(signInRes.status).toBe(200);
+    const cookie = signInRes.headers.get("set-cookie") ?? "";
+    const signInBody = (await signInRes.json()) as { user: { id: string } };
+
+    // DB で role を admin に更新
+    await env.DB.prepare("UPDATE user SET role = 'admin' WHERE id = ?")
+      .bind(signInBody.user.id)
+      .run();
+
+    // /admin/v1/users が 200 で users 配列を返す
+    const adminRes = await app.request(
+      "/admin/v1/users",
+      { headers: { cookie } },
+      testEnv,
+    );
+    expect(adminRes.status).toBe(200);
+    const body = (await adminRes.json()) as {
+      users: Array<{ id: string; email: string; role: string }>;
+    };
+    expect(body.users.length).toBeGreaterThanOrEqual(1);
+    const me = body.users.find((u) => u.id === signInBody.user.id);
+    expect(me).toBeDefined();
+    expect(me?.email).toBe(email);
+    expect(me?.role).toBe("admin");
+  });
 });
