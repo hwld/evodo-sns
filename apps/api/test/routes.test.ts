@@ -154,4 +154,43 @@ describe("auth e2e", () => {
     expect(me.email).toBe(email);
     expect(me.role).toBe("user");
   });
+
+  it("通常 user は /admin/v1/users で 403", async () => {
+    const { default: app } = await import("../src/index");
+    const testEnv = {
+      DB: env.DB,
+      ENVIRONMENT: "development",
+    } as Cloudflare.Env;
+    const email = "bob@example.com";
+
+    // サインアップ → サインイン
+    await app.request(
+      "/api/auth/email-otp/send-verification-otp",
+      {
+        method: "POST",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify({ email, type: "sign-in" }),
+      },
+      testEnv,
+    );
+    const otp = await getOtpForEmail(env.DB, email);
+    const signInRes = await app.request(
+      "/api/auth/sign-in/email-otp",
+      {
+        method: "POST",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify({ email, otp }),
+      },
+      testEnv,
+    );
+    const cookie = signInRes.headers.get("set-cookie") ?? "";
+
+    // /admin/v1/users は role=user なので 403
+    const adminRes = await app.request(
+      "/admin/v1/users",
+      { headers: { cookie } },
+      testEnv,
+    );
+    expect(adminRes.status).toBe(403);
+  });
 });
